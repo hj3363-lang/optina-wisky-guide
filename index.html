@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>옵티나&위스키 신입사원 가이드</title>
+  <style>
+    :root{--navy:#102a43;--blue:#176b87;--cyan:#2ea7a0;--mint:#e9f7f4;--sky:#edf6fb;--ink:#16232d;--muted:#667784;--line:#dce7eb;--white:#fff}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Pretendard,"Noto Sans KR",Arial,sans-serif;color:var(--ink);background:#f7fafb;line-height:1.55}
+    a{text-decoration:none;color:inherit}.wrap{width:min(1120px,calc(100% - 36px));margin:auto}
+    header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+    .nav{height:68px;display:flex;align-items:center;justify-content:space-between;gap:24px}.brand{font-weight:900;color:var(--navy);letter-spacing:-.04em}.brand span{color:var(--cyan)}
+    .links{display:flex;gap:24px;font-size:14px;font-weight:700;color:#536673}.links a:hover{color:var(--blue)}
+    .hero{padding:64px 0;background:radial-gradient(circle at 82% 20%,rgba(46,167,160,.20),transparent 28%),linear-gradient(135deg,#eef8fa 0%,#fff 62%)}
+    .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:44px}.hero-visual{overflow:hidden;border-radius:28px;background:#dbeaf4;box-shadow:0 22px 55px rgba(24,77,104,.18)}.hero-visual img{display:block;width:100%;height:360px;object-fit:cover;object-position:center}
+    .eyebrow{display:inline-flex;padding:7px 12px;border-radius:999px;background:var(--mint);color:#14726e;font-size:13px;font-weight:800}.hero h1{font-size:clamp(34px,5vw,58px);line-height:1.14;letter-spacing:-.055em;margin:20px 0 16px;color:var(--navy)}
+    .hero p{max-width:660px;font-size:18px;color:#516573;margin:0 0 28px}.actions{display:flex;flex-wrap:wrap;gap:12px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 20px;border-radius:12px;font-weight:800;font-size:15px;border:1px solid var(--line);background:#fff}.btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}.account-note{max-width:660px;margin-top:18px;padding:14px 16px;border-radius:12px;background:#f3f8f7;color:#516573;font-size:14px;line-height:1.65}.account-note strong{display:block;margin-bottom:2px;color:#24566a;font-size:15px}.account-note b{color:var(--navy)}
+    section{padding:72px 0}.section-head{display:flex;justify-content:space-between;gap:24px;align-items:end;margin-bottom:28px}.section-head h2{font-size:32px;letter-spacing:-.045em;margin:0;color:var(--navy)}.section-head p{margin:0;color:var(--muted)}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 10px 30px rgba(17,52,70,.055)}
+    .num{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--sky);color:var(--blue);font-weight:900}.card h3{margin:20px 0 8px;font-size:20px;letter-spacing:-.03em}.card p{margin:0;color:var(--muted);font-size:15px;min-height:70px}.card .go{margin-top:20px;width:100%;background:#f2f7f8;color:#24566a}.card .go:hover{background:var(--navy);color:#fff}.card-actions{display:grid;gap:10px;margin-top:20px}.card-actions .go{margin-top:0}.tag{display:inline-block;margin-top:12px;color:#8a6c25;background:#fff7df;border-radius:7px;padding:4px 8px;font-size:12px;font-weight:800}
+    .product{background:var(--navy);color:#fff}.product .section-head h2,.product .section-head p{color:#fff}.product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.product-card{padding:26px;border:1px solid rgba(255,255,255,.17);background:rgba(255,255,255,.075);border-radius:20px}.product-card small{color:#8ee0d7;font-weight:800}.product-card h3{font-size:25px;margin:8px 0}.product-card p{color:#c5d5df;margin:0}
+    .library{display:grid;grid-template-columns:1fr 1fr;gap:14px}.resource{display:flex;gap:16px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:15px;padding:18px}.icon{flex:0 0 42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--mint);font-weight:900;color:var(--blue)}.resource strong{display:block}.resource span{font-size:13px;color:var(--muted)}
+    .notice{margin-top:24px;background:#fff8e8;border:1px solid #f1dfad;border-radius:16px;padding:18px 20px;color:#745f2e;font-size:14px}.quick{margin-top:18px;display:flex;flex-wrap:wrap;gap:10px}.quick a{padding:9px 13px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--blue);font-size:13px;font-weight:800}
+    .finish{padding:68px 0;background:linear-gradient(135deg,#1b7084,#1f9a91);color:#fff;text-align:center}.finish h2{font-size:32px;margin:0 0 12px}.finish p{margin:0 auto 24px;max-width:620px;color:#dff7f3}.finish .btn{border:0}
+    footer{padding:28px 0;color:#788995;font-size:13px;text-align:center;background:#fff}
+    @media(max-width:800px){.links{display:none}.hero{padding:48px 0}.hero-grid{grid-template-columns:1fr;gap:28px}.hero-visual img{height:250px}.steps,.product-grid{grid-template-columns:1fr}.library{grid-template-columns:1fr}.section-head{display:block}.section-head p{margin-top:8px}section{padding:54px 0}.card p{min-height:auto}}
+  </style>
+</head>
+<body>
+  <header><div class="wrap nav"><div class="brand">OPTINA <span>& WISKY</span></div><nav class="links"><a href="#start">학습 시작</a><a href="#product">제품 한눈에 보기</a><a href="#library">자료실</a><a href="#finish">교육 신청</a></nav></div></header>
+  <main>
+    <section class="hero"><div class="wrap hero-grid"><div><span class="eyebrow">NEW EMPLOYEE QUICK GUIDE</span><h1>옵티나&위스키,<br>여기서부터 시작하세요</h1><p>제품 이해부터 검사 흐름, 고객 설명, 현장 활용까지. 아래 순서대로 클릭하면 신입 교육의 핵심 내용을 빠르게 익힐 수 있습니다.</p><div class="actions"><a class="btn primary" href="#start">STEP 01부터 시작</a><a class="btn" href="https://daewoongfmc.imweb.me/OPTiNAxWISKY-Search" target="_blank" rel="noopener">대백과사전 바로가기</a></div><div class="account-note"><strong>대백과사전 계정이 없으신가요?</strong>메일 수신자를 <b>‘대백과사전’</b>으로 지정해 계정을 신청해 주세요.<br>신청 메일에는 본인의 <b>베어월드 아이디</b>를 꼭 기재해 주세요.</div></div><div class="hero-visual"><img src="https://cdn.imweb.me/thumbnail/20250710/e9bc9603b381e.jpg" alt="위스키 안저영상 분석 화면"></div></div></section>
+
+    <section id="start"><div class="wrap"><div class="section-head"><div><h2>신입사원 학습 코스</h2><p>왼쪽 위 번호부터 차례대로 진행해 주세요.</p></div><p>예상 학습시간 약 40분</p></div><div class="steps">
+      <article class="card"><div class="num">01</div><h3>10분 제품 이해</h3><p>STEP 1 전용 PDF 교육자료로 제품의 전체 그림을 익힙니다. 학습 후 이 페이지로 돌아와 STEP 2를 진행해 주세요.</p><a class="btn go" href="https://drive.google.com/file/d/1PKHgkddy5B1zXiShJhQ3OdLNbkP68y12/view?usp=sharing" target="_blank" rel="noopener noreferrer">10분 교육 시작하기</a></article>
+      <article class="card"><div class="num">02</div><h3>검사 과정 익히기</h3><p>설치와 촬영 방법을 영상으로 보고, 노인환자 및 촬영이 어려운 환자의 팁을 학습합니다.</p><a class="btn go" href="https://vimeo.com/908474693?p=0s" target="_blank" rel="noopener">설치·검사 영상 보기</a></article>
+      <article class="card"><div class="num">03</div><h3>결과 설명하기</h3><p>3대 실명질환 결과지, 병변 히트맵과 환자 설명 시 꼭 알아야 할 내용을 확인합니다.</p><div class="card-actions"><a class="btn go" href="https://daewoongfmc.imweb.me/OPTiNAxWISKY-BD/?q=YToxOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjt9&amp;bmode=view&amp;idx=167282910&amp;t=board" target="_blank" rel="noopener">결과 판독 설명서</a><a class="btn go" href="https://daewoongfmc.imweb.me/94/?idx=169963424&amp;bmode=view" target="_blank" rel="noopener">판독 결과지 확인하기</a></div></article>
+      <article class="card"><div class="num">04</div><h3>고객에게 제안하기</h3><p>최신 제품·질환 설명자료와 가격·수익 시뮬레이션으로 고객 상담을 준비합니다.</p><div class="card-actions"><a class="btn go" href="https://daewoongfmc.imweb.me/OPTiNAxWISKY-BD/?q=YToxOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjt9&amp;bmode=view&amp;idx=167622114&amp;t=board" target="_blank" rel="noopener">2026년 브로셔</a><a class="btn go" href="https://daewoongfmc.imweb.me/OPTiNAxWISKY-Product" target="_blank" rel="noopener">가격·수익 자료 보기</a></div><span class="tag">사내 열람 전용</span></article>
+      <article class="card"><div class="num">05</div><h3>현장 업무 진행하기</h3><p>동도·원격지원 신청, 더샵 구매, 설치와 CS 요청 경로를 확인합니다.</p><a class="btn go" href="https://docs.google.com/spreadsheets/d/12gN5XUmcTgoQqoCOc7sx9aQZrdcLnWKT53ZK3oGge5A/edit?pli=1&gid=1143530266#gid=1143530266" target="_blank" rel="noopener">동도·원격지원 신청</a></article>
+      <article class="card"><div class="num">06</div><h3>교육 완료하기</h3><p>짧은 확인 퀴즈를 제출하고 필요한 사무소 또는 Zoom 교육을 신청합니다.</p><a class="btn go" href="#finish">완료 및 교육 신청</a></article>
+    </div></div></section>
+
+    <section class="product" id="product"><div class="wrap"><div class="section-head"><div><h2>세 가지를 먼저 기억하세요</h2><p>신입 교육에서 가장 먼저 잡아야 할 제품별 역할입니다.</p></div></div><div class="product-grid">
+      <article class="product-card"><small>DEVICE</small><h3>옵티나</h3><p>안저를 촬영하는 카메라입니다. 짧은 검사로 망막과 시신경 상태를 확인할 수 있는 영상을 확보합니다.</p></article>
+      <article class="product-card"><small>AI ANALYSIS</small><h3>위스키</h3><p>안저영상을 분석해 당뇨망막병증, 황반변성, 녹내장 의심 여부를 제시합니다.</p></article>
+      <article class="product-card"><small>CARDIOVASCULAR</small><h3>CVD 분석</h3><p>안저영상을 활용해 심혈관질환 위험을 확인하고 만성질환 상담과 후속검사에 활용합니다.</p></article>
+    </div></div></section>
+
+    <section id="library"><div class="wrap"><div class="section-head"><div><h2>신입 필수 자료실</h2><p>대백과사전에 등록된 최신 자료를 학습 목적에 맞춰 골랐습니다.</p></div></div><div class="library">
+      <a class="resource" href="https://daewoongfmc.imweb.me/OPTiNAxWISKY-BD/?q=YToxOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjt9&bmode=view&idx=169351873&t=board" target="_blank" rel="noopener"><div class="icon">SP</div><div><strong>최신 제품·질환 설명자료</strong><span>옵티나·위스키 제품과 3대 실명질환 기본 교육</span></div></a>
+      <a class="resource" href="https://daewoongfmc.imweb.me/OPTiNAxWISKY-BD/?q=YToxOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjt9&bmode=view&idx=167622114&t=board" target="_blank" rel="noopener"><div class="icon">HCP</div><div><strong>HCP용 브로슈어</strong><span>2026년 수가가 반영된 의료진용 안내 자료</span></div></a>
+      <a class="resource" href="https://daewoongfmc.imweb.me/OPTiNAxWISKY-BD/?q=YToxOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjt9&bmode=view&idx=167308385&t=board" target="_blank" rel="noopener"><div class="icon">PT</div><div><strong>환자용 리플렛</strong><span>환자 검사 안내와 결과 상담에 활용</span></div></a>
+      <a class="resource" href="https://daewoongfmc.imweb.me/OPTiNAxWISKY-BD/?q=YToxOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjt9&bmode=view&idx=170982296&t=board" target="_blank" rel="noopener"><div class="icon">TIP</div><div><strong>노인환자 촬영 가이드</strong><span>소동공과 촬영 난이도가 높은 환자 대응</span></div></a>
+      <a class="resource" href="https://daewoongfmc.imweb.me/OPTiNAxWISKY-Data/?q=YToxOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjt9&bmode=view&idx=173042264&t=board" target="_blank" rel="noopener"><div class="icon">₩</div><div><strong>위스키+CVD 수익 계산기</strong><span>2026년 8월 최신 오프라인 계산기</span></div></a>
+      <a class="resource" href="https://daewoongfmc.imweb.me/OPTiNAxWISKY-Data/?q=YToxOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjt9&bmode=view&idx=171587575&t=board" target="_blank" rel="noopener"><div class="icon">CVD</div><div><strong>CVD 검사 프로세스</strong><span>대상자 안내부터 결과 확인까지 현장 운영 흐름</span></div></a>
+      <a class="resource" href="https://daewoongfmc.imweb.me/OPTiNAxWISKY-Data/?q=YToxOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjt9&bmode=view&idx=171687649&t=board" target="_blank" rel="noopener"><div class="icon">필수</div><div><strong>CVD 대상자 설명문·동의서</strong><span>CVD 운영 전 반드시 확인할 자료</span></div></a>
+      <a class="resource" href="https://daewoongfmc.imweb.me/OPTiNAxWISKY-FAQ" target="_blank" rel="noopener"><div class="icon">FAQ</div><div><strong>반대 극복 FAQ</strong><span>촬영·수가·질환·가격 관련 현장 질문 모음</span></div></a>
+    </div><div class="notice"><strong>자료 취급 주의</strong><br>가격·교육·운영 자료는 사내 열람용입니다. 외부 전달 시에는 대백과사전의 ‘홍보자료(material)’에 등록된 자료만 사용하세요.</div></div></section>
+
+    <section class="finish" id="finish"><div class="wrap"><h2>학습을 마쳤나요?</h2><p>이해도 확인 퀴즈를 제출하거나 사업부·사무소 교육을 신청하세요. 신입 교육 3주차 월요일에는 20분 Zoom 교육으로 핵심 내용을 다시 정리합니다.</p><div class="actions" style="justify-content:center"><a class="btn" href="#" onclick="pending(event)">학습 완료 제출</a><a class="btn" href="#" onclick="pending(event)">교육 신청하기</a><a class="btn" href="#" onclick="pending(event)">PM에게 문의하기</a></div></div></section>
+  </main>
+  <footer>옵티나&위스키 신입사원 가이드 · 디지털헬스3팀</footer>
+  <script>function pending(e){e.preventDefault();alert('교육 신청 및 완료 제출 링크가 확정되면 연결됩니다.');}</script>
+</body>
+</html>
