@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>옵티나&위스키 수익 시뮬레이션</title>
+<style>
+:root{
+  --navy:#17324d; --blue:#2f74c0; --blue2:#1f5fa3; --sky:#eaf4ff;
+  --green:#16866a; --greenbg:#eaf8f3; --orange:#d56d16; --orangebg:#fff4e8;
+  --red:#c84545; --text:#1f2937; --muted:#6b7280; --line:#dfe5ec;
+  --page:#f5f7fa; --white:#fff; --purple:#6750a4; --purplebg:#f3efff;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--page);color:var(--text);
+  font-family:"Pretendard","Noto Sans KR","Malgun Gothic",Arial,sans-serif
+}
+.wrap{width:min(1120px,calc(100% - 32px));margin:32px auto 60px}
+.hero{
+  padding:30px;border-radius:24px;
+  background:linear-gradient(135deg,#17324d 0%,#285e91 100%);
+  color:white;box-shadow:0 16px 40px rgba(23,50,77,.18)
+}
+.hero h1{margin:0 0 8px;font-size:clamp(25px,4vw,38px);letter-spacing:-.04em}
+.hero p{margin:0;color:rgba(255,255,255,.84);font-size:15px;line-height:1.6}
+
+/* 구매 방식 선택 */
+.purchase-selector{
+  margin-top:20px;
+  padding:18px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:22px;
+  box-shadow:0 10px 28px rgba(31,41,55,.07)
+}
+.purchase-selector-title{
+  margin:0 0 12px;
+  font-size:17px;
+  font-weight:900;
+  color:var(--navy);
+  text-align:center
+}
+.purchase-tabs{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px
+}
+.purchase-tab{
+  position:relative;
+  border:2px solid #d9e1ea;
+  border-radius:18px;
+  padding:20px 18px;
+  background:#f8fafc;
+  color:#5b6572;
+  font-size:18px;
+  font-weight:900;
+  cursor:pointer;
+  transition:.18s ease;
+  text-align:center
+}
+.purchase-tab:hover{
+  transform:translateY(-1px);
+  border-color:#9fc4ea
+}
+.purchase-tab.active{
+  color:white;
+  border-color:var(--blue);
+  background:linear-gradient(135deg,#2f74c0,#1f5fa3);
+  box-shadow:0 10px 22px rgba(47,116,192,.24)
+}
+.purchase-tab .small{
+  display:block;
+  margin-top:5px;
+  font-size:12px;
+  font-weight:700;
+  opacity:.84
+}
+.purchase-tab.active::after{
+  content:"선택됨";
+  position:absolute;
+  top:9px;
+  right:10px;
+  padding:3px 7px;
+  border-radius:999px;
+  background:rgba(255,255,255,.18);
+  font-size:10px;
+  font-weight:900
+}
+
+.panel{
+  margin-top:18px;padding:24px;border-radius:20px;background:#fff;
+  border:1px solid var(--line);box-shadow:0 8px 28px rgba(31,41,55,.06)
+}
+.hidden{display:none!important}
+.block-title{
+  margin:0 0 8px;font-size:19px;font-weight:900;color:var(--navy);letter-spacing:-.03em
+}
+.help{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.6}
+
+/* 구매안내 */
+.purchase-info{
+  margin-bottom:24px;
+  padding:18px 20px;
+  border-radius:18px;
+  border:1px solid #cfe0f2;
+  background:linear-gradient(180deg,#f8fbff,#eef6ff)
+}
+.purchase-info.subscription{
+  border-color:#dcd3f4;
+  background:linear-gradient(180deg,#fbf9ff,#f3efff)
+}
+.purchase-info.cvd{
+  border-color:#cbe8df;
+  background:linear-gradient(180deg,#f8fffc,#edf9f5)
+}
+.purchase-info.cvd .badge{background:var(--green)}
+.purchase-info .info-head{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:12px
+}
+.purchase-info .badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:42px;
+  height:28px;
+  padding:0 10px;
+  border-radius:999px;
+  background:var(--blue);
+  color:white;
+  font-size:12px;
+  font-weight:900
+}
+.purchase-info.subscription .badge{background:var(--purple)}
+.purchase-info .info-title{
+  font-size:17px;
+  font-weight:900;
+  color:var(--navy)
+}
+.info-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px
+}
+.info-item{
+  padding:12px 14px;
+  border-radius:12px;
+  background:rgba(255,255,255,.78);
+  border:1px solid rgba(207,224,242,.9);
+  font-size:13px;
+  line-height:1.55;
+  color:#465363
+}
+.purchase-info.subscription .info-item{border-color:#e4dcf8}
+.info-item strong{color:var(--navy)}
+.info-item.important{
+  background:#fffaf0;
+  border-color:#f3dfb7
+}
+
+.option-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px}
+.option-tab{
+  appearance:none;border:1px solid var(--line);border-radius:14px;background:#fff;
+  color:#4b5563;padding:13px 10px;cursor:pointer;font-size:14px;font-weight:800;transition:.15s
+}
+.option-tab:hover{border-color:#9fc4ea;background:#f8fbff}
+.option-tab.active{
+  color:#fff;border-color:var(--blue);background:var(--blue);
+  box-shadow:0 6px 16px rgba(47,116,192,.22)
+}
+.plan-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}
+.plan-tab{
+  border:1px solid var(--line);border-radius:16px;background:#fff;
+  padding:16px 12px;cursor:pointer;text-align:left
+}
+.plan-tab.active{
+  border:2px solid var(--purple);background:#f7f4ff;
+  box-shadow:0 6px 16px rgba(103,80,164,.14)
+}
+.plan-tab .plan-name{font-size:15px;font-weight:900;color:var(--navy)}
+.plan-tab .plan-price{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.5}
+
+.cvd-mode-tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:22px}
+.cvd-mode-tab{border:1px solid var(--line);border-radius:16px;background:#fff;padding:16px 14px;cursor:pointer;text-align:left;transition:.15s}
+.cvd-mode-tab:hover{border-color:#9ed6c6;background:#f7fffc}
+.cvd-mode-tab.active{border:2px solid var(--green);background:#effaf6;box-shadow:0 6px 16px rgba(22,134,106,.13)}
+.cvd-mode-tab .mode-name{font-size:15px;font-weight:900;color:var(--navy)}
+.cvd-mode-tab .mode-desc{margin-top:6px;color:var(--muted);font-size:12px;line-height:1.5}
+
+.input-row{
+  display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:24px;align-items:center;
+  padding-top:20px;border-top:1px solid var(--line)
+}
+.input-title{margin:0 0 8px;font-size:22px;letter-spacing:-.03em}
+.input-help{margin:0;color:var(--muted);line-height:1.6;font-size:14px}
+.input-box{
+  display:flex;align-items:center;gap:10px;padding:12px 16px;
+  border:2px solid #b9d3ef;border-radius:16px;background:#f8fbff
+}
+.input-box input{
+  min-width:0;width:100%;border:0;outline:0;background:transparent;
+  color:var(--navy);font-size:34px;font-weight:800;text-align:right
+}
+.input-box span{flex:0 0 auto;color:var(--muted);font-weight:700;font-size:17px}
+
+.assumptions{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
+.assumption{padding:14px 16px;border-radius:14px;background:#f8fafc;border:1px solid var(--line)}
+.assumption.highlight{background:#edf6ff;border-color:#cbe3fb}
+.assumption .label{color:var(--muted);font-size:12px;margin-bottom:5px}
+.assumption .value{font-size:17px;font-weight:800;letter-spacing:-.02em}
+.money-input{
+  display:flex;align-items:center;gap:6px;margin-top:2px
+}
+.money-input input{
+  width:100%;min-width:0;border:1px solid #b9d3ef;border-radius:10px;
+  padding:8px 10px;background:#fff;color:var(--navy);
+  font-size:17px;font-weight:900;text-align:right;outline:none
+}
+.money-input input:focus{
+  border-color:var(--blue);box-shadow:0 0 0 3px rgba(47,116,192,.10)
+}
+.money-input span{font-size:14px;font-weight:800;color:var(--muted)}
+
+.section-title{margin:28px 0 14px;font-size:21px;letter-spacing:-.03em}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{
+  min-height:148px;padding:20px;border-radius:18px;background:#fff;
+  border:1px solid var(--line);box-shadow:0 6px 22px rgba(31,41,55,.05)
+}
+.card.blue{background:var(--sky);border-color:#cde3fa}
+.card.green{background:var(--greenbg);border-color:#ccecdf}
+.card.orange{background:var(--orangebg);border-color:#f4dcc3}
+.card .label{color:var(--muted);font-size:13px;font-weight:700}
+.card .value{
+  margin-top:12px;color:var(--navy);font-size:clamp(23px,3vw,33px);
+  font-weight:900;letter-spacing:-.05em;word-break:keep-all
+}
+.card.green .value{color:var(--green)}
+.card.orange .value{color:var(--orange)}
+.card .sub{margin-top:8px;color:var(--muted);font-size:12px;line-height:1.55}
+
+.year-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.year-card{
+  padding:22px;border-radius:18px;background:#fff;border:1px solid var(--line);
+  box-shadow:0 6px 22px rgba(31,41,55,.05)
+}
+.year-card .year{color:var(--blue);font-size:18px;font-weight:900}
+.year-card .profit{
+  margin-top:14px;font-size:clamp(24px,3vw,34px);
+  font-weight:900;letter-spacing:-.05em
+}
+.profit.positive{color:var(--green)}
+.profit.negative{color:var(--red)}
+.year-card .caption{margin-top:8px;color:var(--muted);font-size:12px;line-height:1.55}
+
+.formula{
+  margin-top:22px;padding:18px 20px;border-radius:16px;background:#f8fafc;
+  border:1px dashed #bfc9d5;color:#465363;line-height:1.8;font-size:13px
+}
+.formula strong{color:var(--navy)}
+.note{margin-top:16px;color:var(--muted);font-size:12px;line-height:1.7}
+.actions{display:flex;justify-content:flex-end;margin-top:18px}
+.print-btn{
+  padding:11px 16px;border:0;border-radius:12px;background:var(--navy);
+  color:white;font-size:14px;font-weight:800;cursor:pointer
+}
+.phase-badge{
+  display:inline-block;margin-left:6px;padding:3px 7px;border-radius:999px;
+  background:#eaf4ff;color:var(--blue);font-size:11px;font-weight:800
+}
+
+@media(max-width:820px){
+  .input-row,.grid,.year-grid{grid-template-columns:1fr}
+  .assumptions{grid-template-columns:repeat(2,1fr)}
+  .option-tabs,.plan-tabs,.info-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:520px){
+  .wrap{width:min(100% - 20px,1120px);margin-top:14px}
+  .hero,.panel{padding:20px;border-radius:18px}
+  .assumptions,.option-tabs,.plan-tabs,.cvd-mode-tabs,.info-grid,.purchase-tabs{grid-template-columns:1fr}
+}
+@media print{
+  @page{
+    size:A4 portrait;
+    margin:5mm;
+  }
+
+  html,body{
+    margin:0!important;
+    padding:0!important;
+    background:white!important;
+    -webkit-print-color-adjust:exact!important;
+    print-color-adjust:exact!important;
+  }
+
+  body{
+    zoom:0.38;
+  }
+
+  .wrap{
+    width:1120px!important;
+    max-width:none!important;
+    margin:0 auto!important;
+    transform-origin:top center!important;
+  }
+
+  .actions{
+    display:none!important;
+  }
+
+  .hero,
+  .panel,
+  .card,
+  .year-card,
+  .purchase-selector{
+    box-shadow:none!important;
+  }
+
+  .purchase-selector,
+  .panel,
+  .grid,
+  .year-grid,
+  .formula,
+  .hero{
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+
+  *{
+    -webkit-print-color-adjust:exact!important;
+    print-color-adjust:exact!important;
+  }
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <section class="hero">
+    <h1>옵티나·위스키·CVD 수익 시뮬레이션</h1>
+    <p>상품과 의료기관 유형, 하루 평균 검사 인원을 선택하면 예상 수익을 바로 확인할 수 있습니다.</p>
+  </section>
+
+  <section class="purchase-selector">
+    <h2 class="purchase-selector-title">먼저 계산할 상품을 선택해 주세요</h2>
+    <div class="purchase-tabs">
+      <button class="purchase-tab active" data-mode="cash">
+        일시불 구매
+        <span class="small">옵티나 + 위스키 판독권 구매</span>
+      </button>
+      <button class="purchase-tab" data-mode="subscription">
+        무제한 구독
+        <span class="small">24개월 구독 · 위스키 판독 무제한</span>
+      </button>
+      <button class="purchase-tab" data-mode="cvd">
+        CVD 판독권
+        <span class="small">CVD 단독 · 3대 실명질환 + CVD</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="panel">
+
+    <div id="cashInfo" class="purchase-info">
+      <div class="info-head">
+        <span class="badge">일시불</span>
+        <div class="info-title">일시불 구매 안내</div>
+      </div>
+      <div class="info-grid">
+        <div class="info-item"><strong>구매 방법</strong><br>더샵에서 구매 가능합니다.</div>
+        <div class="info-item"><strong>구매 구성</strong><br>옵티나 카메라 + 위스키 판독권을 구매하는 방식입니다.</div>
+      </div>
+    </div>
+
+    <div id="subscriptionInfo" class="purchase-info subscription hidden">
+      <div class="info-head">
+        <span class="badge">구독</span>
+        <div class="info-title">무제한 구독 구매 안내</div>
+      </div>
+      <div class="info-grid">
+        <div class="info-item"><strong>24개월 납부 후 옵티나 카메라는 병원 소유</strong><br>렌탈 후 반납하는 방식이 아니라, 구매와 같이 병원에서 계속 사용하실 수 있습니다.</div>
+        <div class="info-item"><strong>구매 방법</strong><br>더샵에서 구매 가능합니다.</div>
+        <div class="info-item important"><strong>부외품은 포함되지 않습니다.</strong><br>전동테이블, 미니PC, 모니터 등은 별도 구매가 필요합니다.</div>
+        <div class="info-item important"><strong>CVD 판독권은 별도입니다.</strong><br>무제한 구독에는 위스키 판독만 포함되며, CVD 판독권은 별도 구매 상품입니다.</div>
+      </div>
+    </div>
+
+    <div id="cvdInfo" class="purchase-info cvd hidden">
+      <div class="info-head">
+        <span class="badge">CVD</span>
+        <div class="info-title">CVD 판독권 구매 안내</div>
+      </div>
+      <div class="info-grid">
+        <div class="info-item"><strong>CVD 판독권 단독 구매 가능</strong><br>위스키를 구매하지 않아도 CVD 판독권만 구매하여 사용할 수 있습니다.</div>
+        <div class="info-item"><strong>위스키 판독권 단독 구매 가능</strong><br>3대 실명질환 판독권인 위스키도 단독 구매가 가능합니다.</div>
+        <div class="info-item important"><strong>옵티나 안저카메라 단독 구매 불가</strong><br>옵티나 카메라만 별도로 구매하는 상품은 제공되지 않습니다.</div>
+        <div class="info-item"><strong>구매 방법</strong><br>CVD 판독권은 더샵에서 구매 가능합니다.</div>
+      </div>
+    </div>
+
+    <h2 class="block-title">의료기관 유형 선택</h2>
+    <p class="help">기관 유형을 클릭하면 해당 수가가 자동 적용됩니다.</p>
+    <div class="option-tabs">
+      <button class="option-tab hospital-tab active" data-type="clinic">의원</button>
+      <button class="option-tab hospital-tab" data-type="hospital">병원</button>
+      <button class="option-tab hospital-tab non-cvd-hospital" data-type="general">종합병원</button>
+      <button class="option-tab hospital-tab non-cvd-hospital" data-type="tertiary">상급종합병원</button>
+    </div>
+
+    <div id="subscriptionPlanArea" class="hidden">
+      <h2 class="block-title">무제한 구독 상품 선택</h2>
+      <p class="help">24개월 동안 위스키 판독권을 횟수 제한 없이 사용하고, 25개월차부터는 환자 1명당 3,000원의 판독비가 적용됩니다.</p>
+      <div class="plan-tabs">
+        <button class="plan-tab active" data-plan="p0">
+          <div class="plan-name">선납금 0원</div>
+          <div class="plan-price">월 740,000원 × 24개월</div>
+        </button>
+        <button class="plan-tab" data-plan="p500">
+          <div class="plan-name">선납금 5,000,000원</div>
+          <div class="plan-price">월 513,000원 × 24개월</div>
+        </button>
+        <button class="plan-tab" data-plan="p1000">
+          <div class="plan-name">선납금 10,000,000원</div>
+          <div class="plan-price">월 275,000원 × 24개월</div>
+        </button>
+      </div>
+    </div>
+
+    <div id="cvdModeArea" class="hidden">
+      <h2 class="block-title">CVD 운영 방식 선택</h2>
+      <p class="help">엑셀 제안서 기준으로 CVD 단독 또는 3대 실명질환 + CVD 통합 운영을 선택할 수 있습니다.</p>
+      <div class="cvd-mode-tabs">
+        <button class="cvd-mode-tab active" data-cvd-mode="standalone">
+          <div class="mode-name">CVD 단독</div>
+          <div class="mode-desc">CVD 판독비 12,100원/건 · 위스키 이용료 없음</div>
+        </button>
+        <button class="cvd-mode-tab" data-cvd-mode="integrated">
+          <div class="mode-name">3대 실명질환 + CVD</div>
+          <div class="mode-desc">CVD 12,100원 + 위스키 3,000원/건</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div>
+        <h2 class="input-title">하루 평균 검사 인원</h2>
+        <p class="input-help">월 근무일수는 22일로 계산합니다.</p>
+      </div>
+      <label class="input-box">
+        <input id="dailyPatients" type="number" min="0" step="0.1" value="5">
+        <span>명/일</span>
+      </label>
+    </div>
+
+    <div id="cashAssumptions" class="assumptions">
+      <div class="assumption"><div class="label">옵티나 카메라</div><div class="value">11,900,000원</div></div>
+      <div class="assumption"><div class="label">위스키 판독권</div><div class="value">3,300,000원 / 1,100회</div></div>
+      <div class="assumption highlight"><div class="label" id="cashFeeLabel">환자 1명당 수가 · 의원</div><div class="value" id="cashFeeValue">13,100원</div></div>
+      <div class="assumption highlight"><div class="label">환자 1명당 예상 수익</div><div class="value" id="cashUnitProfit">10,100원</div></div>
+    </div>
+
+    <div id="subAssumptions" class="assumptions hidden">
+      <div class="assumption"><div class="label">선납금</div><div class="value" id="subUpfront">0원</div></div>
+      <div class="assumption"><div class="label">월 구독료 · 24개월</div><div class="value" id="subMonthlyFee">740,000원</div></div>
+      <div class="assumption highlight"><div class="label" id="subFeeLabel">환자 1명당 수가 · 의원</div><div class="value" id="subFeeValue">13,100원</div></div>
+      <div class="assumption highlight"><div class="label">25개월차 이후 환자당 수익</div><div class="value" id="postSubUnitProfit">10,100원</div></div>
+    </div>
+
+    <div id="cvdAssumptions" class="assumptions hidden">
+      <div class="assumption"><div class="label">안저 급여수가</div><div class="value" id="cvdFundusFee">13,100원</div></div>
+      <div class="assumption highlight">
+        <div class="label">CVD 비급여수가 · 직접 입력</div>
+        <div class="money-input">
+          <input id="cvdNoncoveredInput" type="number" min="0" step="1000" value="40000" aria-label="CVD 비급여수가">
+          <span>원</span>
+        </div>
+      </div>
+      <div class="assumption"><div class="label" id="cvdCostLabel">CVD 판독비용 (환자 1명당)</div><div class="value" id="cvdCostPerPatient">12,100원</div></div>
+      <div class="assumption highlight"><div class="label">환자 1명당 예상 순수익</div><div class="value" id="cvdNetPerPatient">41,000원</div></div>
+    </div>
+  </section>
+
+  <h2 class="section-title" id="monthlySectionTitle">월 수익 예상</h2>
+  <section class="grid">
+    <article class="card blue">
+      <div class="label">월 검사 인원</div>
+      <div class="value" id="monthlyPatients">110명</div>
+      <div class="sub">하루 검사 인원 × 월 22일</div>
+    </article>
+    <article class="card">
+      <div class="label" id="monthlyRevenueLabel">월 총 매출</div>
+      <div class="value" id="monthlyRevenue">1,441,000원</div>
+      <div class="sub" id="monthlyRevenueSub">월 검사 인원 × 의원 수가 13,100원</div>
+    </article>
+    <article class="card" id="costCard">
+      <div class="label" id="costLabel">월 판독 원가</div>
+      <div class="value" id="monthlyCost">330,000원</div>
+      <div class="sub" id="costSub">월 검사 인원 × 3,000원</div>
+    </article>
+    <article class="card green">
+      <div class="label" id="monthlyProfitLabel">월 예상 수익</div>
+      <div class="value" id="monthlyProfit">1,111,000원</div>
+      <div class="sub" id="monthlyProfitSub">월 총 매출 − 월 판독 원가</div>
+    </article>
+    <article class="card orange">
+      <div class="label" id="breakEvenLabel">손익분기점</div>
+      <div class="value" id="breakEven">약 13.7개월</div>
+      <div class="sub" id="breakEvenSub">14개월차에 초기 구매금액 회수 예상</div>
+    </article>
+    <article class="card blue">
+      <div class="label" id="futureProfitLabel">손익분기점 이후 연간 수익</div>
+      <div class="value" id="futureProfit">13,332,000원</div>
+      <div class="sub" id="futureProfitSub">월 예상 수익 × 12개월</div>
+    </article>
+  </section>
+
+  <h2 class="section-title" id="cumulativeSectionTitle">누적 수익 예상</h2>
+  <section class="year-grid">
+    <article class="year-card">
+      <div class="year">1년차</div>
+      <div class="profit" id="profit1Year">-1,868,000원</div>
+      <div class="caption" id="caption1">1년 수익에서 초기 구매금액을 차감한 금액</div>
+    </article>
+    <article class="year-card">
+      <div class="year">3년차</div>
+      <div class="profit" id="profit3Year">24,796,000원</div>
+      <div class="caption" id="caption3">3년 누적 수익에서 초기 구매금액을 차감한 금액</div>
+    </article>
+    <article class="year-card">
+      <div class="year">5년차</div>
+      <div class="profit" id="profit5Year">51,460,000원</div>
+      <div class="caption" id="caption5">5년 누적 수익에서 초기 구매금액을 차감한 금액</div>
+    </article>
+  </section>
+
+  <section class="formula" id="formulaBox"></section>
+  <p class="note" id="noteText">본 결과는 월 22일 근무를 가정한 예상치입니다. 부가세, 카드수수료, 인건비, 유지보수비, 추가 소모품, 휴일 및 실제 청구 조건은 반영하지 않았습니다.</p>
+  <div class="actions"><button class="print-btn" onclick="window.print()">결과 인쇄하기</button></div>
+</main>
+
+<script>
+const CAMERA_PRICE=11900000;
+const WISKY_PACKAGE_PRICE=3300000;
+const INITIAL_COST=CAMERA_PRICE+WISKY_PACKAGE_PRICE;
+const WISKY_COST_PER_PATIENT=3000;
+const CVD_COST_PER_PATIENT=12100;
+const WORKING_DAYS=22;
+
+const HOSPITALS={
+  clinic:{name:"의원",fee:13100},
+  hospital:{name:"병원",fee:12054},
+  general:{name:"종합병원",fee:12628},
+  tertiary:{name:"상급종합병원",fee:13202}
+};
+
+const PLANS={
+  p0:{name:"선납금 0원",upfront:0,monthly:740000},
+  p500:{name:"선납금 500만원",upfront:5000000,monthly:513000},
+  p1000:{name:"선납금 1,000만원",upfront:10000000,monthly:275000}
+};
+
+let mode="cash";
+let hospitalType="clinic";
+let planType="p0";
+let cvdMode="standalone";
+
+const $=id=>document.getElementById(id);
+const fmtWon=v=>{
+  const n=Math.round(v), sign=n<0?"-":"";
+  return sign+Math.abs(n).toLocaleString("ko-KR")+"원";
+};
+const fmtPeople=v=>(Math.round(v*10)/10).toLocaleString("ko-KR")+"명";
+
+function colorProfit(el,value){
+  el.classList.remove("positive","negative");
+  el.classList.add(value>=0?"positive":"negative");
+}
+
+function setHospitalButtonsForMode(){
+  document.querySelectorAll(".non-cvd-hospital").forEach(btn=>btn.classList.remove("hidden"));
+  document.querySelectorAll(".hospital-tab").forEach(btn=>{
+    btn.classList.toggle("active",btn.dataset.type===hospitalType);
+  });
+}
+
+function cumulativeSubscription(months, monthlyRevenue, monthlyPatients, plan){
+  const monthsInSub=Math.min(months,24);
+  const monthsAfter=Math.max(0,months-24);
+  const subPhase=monthsInSub*(monthlyRevenue-plan.monthly)-plan.upfront;
+  const postMonthlyProfit=monthlyPatients*(HOSPITALS[hospitalType].fee-WISKY_COST_PER_PATIENT);
+  return subPhase + monthsAfter*postMonthlyProfit;
+}
+
+function subscriptionBreakEven(monthlyRevenue, monthlyPatients, plan){
+  const netDuring=monthlyRevenue-plan.monthly;
+  if(plan.upfront===0 && netDuring>=0) return 1;
+  if(netDuring>0){
+    const m=plan.upfront/netDuring;
+    if(m<=24) return Math.max(1,m);
+  }
+  const cumulative24=24*netDuring-plan.upfront;
+  if(cumulative24>=0) return 24;
+  const postMonthlyProfit=monthlyPatients*(HOSPITALS[hospitalType].fee-WISKY_COST_PER_PATIENT);
+  if(postMonthlyProfit<=0) return Infinity;
+  return 24 + (-cumulative24/postMonthlyProfit);
+}
+
+function resetCommonLabels(){
+  $("monthlySectionTitle").textContent="월 수익 예상";
+  $("cumulativeSectionTitle").textContent="누적 수익 예상";
+  $("monthlyRevenueLabel").textContent="월 총 매출";
+  $("breakEvenLabel").textContent="손익분기점";
+  $("noteText").textContent="본 결과는 월 22일 근무를 가정한 예상치입니다. 부가세, 카드수수료, 인건비, 유지보수비, 추가 소모품, 휴일 및 실제 청구 조건은 반영하지 않았습니다.";
+}
+
+function update(){
+  setHospitalButtonsForMode();
+  const h=HOSPITALS[hospitalType];
+  const daily=Math.max(0,Number($("dailyPatients").value)||0);
+  const monthlyPatients=daily*WORKING_DAYS;
+  $("monthlyPatients").textContent=fmtPeople(monthlyPatients);
+
+  $("cashInfo").classList.toggle("hidden",mode!=="cash");
+  $("subscriptionInfo").classList.toggle("hidden",mode!=="subscription");
+  $("cvdInfo").classList.toggle("hidden",mode!=="cvd");
+  $("subscriptionPlanArea").classList.toggle("hidden",mode!=="subscription");
+  $("cvdModeArea").classList.toggle("hidden",mode!=="cvd");
+  $("cashAssumptions").classList.toggle("hidden",mode!=="cash");
+  $("subAssumptions").classList.toggle("hidden",mode!=="subscription");
+  $("cvdAssumptions").classList.toggle("hidden",mode!=="cvd");
+
+  resetCommonLabels();
+
+  if(mode==="cash"){
+    const monthlyRevenue=monthlyPatients*h.fee;
+    const unitProfit=h.fee-WISKY_COST_PER_PATIENT;
+    const monthlyCost=monthlyPatients*WISKY_COST_PER_PATIENT;
+    const monthlyProfit=monthlyPatients*unitProfit;
+    const annualProfit=monthlyProfit*12;
+    const be=monthlyProfit>0?INITIAL_COST/monthlyProfit:Infinity;
+    const y1=annualProfit-INITIAL_COST;
+    const y3=annualProfit*3-INITIAL_COST;
+    const y5=annualProfit*5-INITIAL_COST;
+
+    $("cashFeeLabel").textContent=`환자 1명당 수가 · ${h.name}`;
+    $("cashFeeValue").textContent=fmtWon(h.fee);
+    $("cashUnitProfit").textContent=fmtWon(unitProfit);
+    $("monthlyRevenue").textContent=fmtWon(monthlyRevenue);
+    $("monthlyRevenueSub").textContent=`월 검사 인원 × ${h.name} 수가 ${h.fee.toLocaleString("ko-KR")}원`;
+    $("costLabel").textContent="월 판독 원가";
+    $("monthlyCost").textContent=fmtWon(monthlyCost);
+    $("costSub").textContent="월 검사 인원 × 3,000원";
+    $("monthlyProfitLabel").textContent="월 예상 수익";
+    $("monthlyProfit").textContent=fmtWon(monthlyProfit);
+    $("monthlyProfitSub").textContent="월 총 매출 − 월 판독 원가";
+
+    if(Number.isFinite(be)){
+      $("breakEven").textContent=`약 ${be.toFixed(1)}개월`;
+      $("breakEvenSub").textContent=`${Math.ceil(be)}개월차에 초기 구매금액 회수 예상`;
+    }else{
+      $("breakEven").textContent="계산 불가";
+      $("breakEvenSub").textContent="하루 검사 인원을 입력해 주세요";
+    }
+
+    $("futureProfitLabel").textContent="손익분기점 이후 연간 수익";
+    $("futureProfit").textContent=fmtWon(annualProfit);
+    $("futureProfitSub").textContent="월 예상 수익 × 12개월";
+    $("profit1Year").textContent=fmtWon(y1);
+    $("profit3Year").textContent=fmtWon(y3);
+    $("profit5Year").textContent=fmtWon(y5);
+    colorProfit($("profit1Year"),y1); colorProfit($("profit3Year"),y3); colorProfit($("profit5Year"),y5);
+    $("caption1").textContent="1년 수익에서 초기 구매금액 15,200,000원을 차감한 금액";
+    $("caption3").textContent="3년 누적 수익에서 초기 구매금액을 차감한 금액";
+    $("caption5").textContent="5년 누적 수익에서 초기 구매금액을 차감한 금액";
+    $("formulaBox").innerHTML=`<strong>일시불 구매 계산 기준</strong><br>
+      초기 구매금액: 11,900,000원 + 3,300,000원 = 15,200,000원<br>
+      선택 수가: ${h.name} ${h.fee.toLocaleString("ko-KR")}원<br>
+      환자 1명당 예상 수익: ${h.fee.toLocaleString("ko-KR")}원 − 3,000원 = ${unitProfit.toLocaleString("ko-KR")}원<br>
+      손익분기점: 15,200,000원 ÷ 월 예상 수익`;
+  }
+
+  if(mode==="subscription"){
+    const monthlyRevenue=monthlyPatients*h.fee;
+    const plan=PLANS[planType];
+    const postUnitProfit=h.fee-WISKY_COST_PER_PATIENT;
+    const netDuring=monthlyRevenue-plan.monthly;
+    const postMonthlyProfit=monthlyPatients*postUnitProfit;
+    const be=subscriptionBreakEven(monthlyRevenue,monthlyPatients,plan);
+    const y1=cumulativeSubscription(12,monthlyRevenue,monthlyPatients,plan);
+    const y3=cumulativeSubscription(36,monthlyRevenue,monthlyPatients,plan);
+    const y5=cumulativeSubscription(60,monthlyRevenue,monthlyPatients,plan);
+
+    $("subUpfront").textContent=fmtWon(plan.upfront);
+    $("subMonthlyFee").textContent=fmtWon(plan.monthly);
+    $("subFeeLabel").textContent=`환자 1명당 수가 · ${h.name}`;
+    $("subFeeValue").textContent=fmtWon(h.fee);
+    $("postSubUnitProfit").textContent=fmtWon(postUnitProfit);
+    $("monthlyRevenue").textContent=fmtWon(monthlyRevenue);
+    $("monthlyRevenueSub").textContent=`월 검사 인원 × ${h.name} 수가 ${h.fee.toLocaleString("ko-KR")}원`;
+    $("costLabel").innerHTML=`월 구독료 <span class="phase-badge">1~24개월</span>`;
+    $("monthlyCost").textContent=fmtWon(plan.monthly);
+    $("costSub").textContent="24개월 동안 월 정액 납부 · 판독권 무제한";
+    $("monthlyProfitLabel").innerHTML=`월 예상 수익 <span class="phase-badge">1~24개월</span>`;
+    $("monthlyProfit").textContent=fmtWon(netDuring);
+    $("monthlyProfitSub").textContent="월 총 매출 − 월 구독료";
+
+    if(Number.isFinite(be)){
+      $("breakEven").textContent=`약 ${be.toFixed(1)}개월`;
+      $("breakEvenSub").textContent=be<=24?`${Math.ceil(be)}개월차에 손익분기점 도달 예상`:`구독 종료 후 ${Math.ceil(be)-24}개월째, 총 ${Math.ceil(be)}개월차 예상`;
+    }else{
+      $("breakEven").textContent="계산 불가";
+      $("breakEvenSub").textContent="하루 검사 인원을 입력해 주세요";
+    }
+
+    $("futureProfitLabel").innerHTML=`3년차 이후 연간 수익 <span class="phase-badge">25개월차~</span>`;
+    $("futureProfit").textContent=fmtWon(postMonthlyProfit*12);
+    $("futureProfitSub").textContent="환자당 판독비 3,000원 적용 후 연간 수익";
+    $("profit1Year").textContent=fmtWon(y1); $("profit3Year").textContent=fmtWon(y3); $("profit5Year").textContent=fmtWon(y5);
+    colorProfit($("profit1Year"),y1); colorProfit($("profit3Year"),y3); colorProfit($("profit5Year"),y5);
+    $("caption1").textContent="선납금과 1년간 월 구독료를 반영한 누적 수익";
+    $("caption3").textContent="24개월 구독 종료 후 12개월간 판독비 3,000원/회 적용";
+    $("caption5").textContent="24개월 구독 종료 후 36개월간 판독비 3,000원/회 적용";
+    $("formulaBox").innerHTML=`<strong>무제한 구독 계산 기준 · ${plan.name}</strong><br>
+      1~24개월: 선납금 ${plan.upfront.toLocaleString("ko-KR")}원 + 월 ${plan.monthly.toLocaleString("ko-KR")}원 납부, 위스키 판독 무제한<br>
+      1~24개월 월 수익: 월 검사매출 − 월 구독료<br>
+      25개월차 이후: 환자 1명당 판독비 3,000원 적용<br>
+      25개월차 이후 환자당 예상 수익: ${h.fee.toLocaleString("ko-KR")}원 − 3,000원 = ${postUnitProfit.toLocaleString("ko-KR")}원`;
+  }
+
+  if(mode==="cvd"){
+    const cvdFee=Math.max(0,Number($("cvdNoncoveredInput").value)||0);
+    const wiskyExtra=cvdMode==="integrated"?WISKY_COST_PER_PATIENT:0;
+    const grossPerPatient=h.fee+cvdFee;
+    const costPerPatient=CVD_COST_PER_PATIENT+wiskyExtra;
+    const netPerPatient=grossPerPatient-costPerPatient;
+    const monthlyRevenue=monthlyPatients*grossPerPatient;
+    const monthlyCost=monthlyPatients*costPerPatient;
+    const monthlyNet=monthlyPatients*netPerPatient;
+    const annualRevenue=monthlyRevenue*12;
+    const annualNet=monthlyNet*12;
+    const y1=annualNet, y3=annualNet*3, y5=annualNet*5;
+    const modeName=cvdMode==="standalone"?"CVD 단독":"3대 실명질환 + CVD";
+
+    $("monthlySectionTitle").textContent="CVD 수익 예상";
+    $("cumulativeSectionTitle").textContent="CVD 누적 순수익 예상";
+    $("monthlyRevenueLabel").textContent="월 총 수익";
+    $("breakEvenLabel").textContent="연 총 수익";
+    $("noteText").textContent="CVD 비급여수가는 직접 입력한 금액을 적용합니다. 기본값은 40,000원이며, 월 22일 근무 기준으로 계산됩니다. 실제 비급여 책정, 청구 조건 및 운영 환경에 따라 달라질 수 있습니다.";
+
+    $("cvdFundusFee").textContent=fmtWon(h.fee);
+    $("cvdCostPerPatient").textContent=fmtWon(costPerPatient);
+    $("cvdCostLabel").textContent =
+      cvdMode === "standalone"
+        ? "CVD 판독비용 (환자 1명당)"
+        : "3대 실명질환+CVD 판독비용 (환자 1명당)";
+    $("cvdNetPerPatient").textContent=fmtWon(netPerPatient);
+
+    $("monthlyRevenue").textContent=fmtWon(monthlyRevenue);
+    $("monthlyRevenueSub").textContent=`월 검사 인원 × (${h.name} 안저수가 ${h.fee.toLocaleString("ko-KR")}원 + CVD ${cvdFee.toLocaleString("ko-KR")}원)`;
+    $("costLabel").textContent=cvdMode==="standalone"?"월 CVD 판독 비용":"월 CVD + 위스키 판독 비용";
+    $("monthlyCost").textContent=fmtWon(monthlyCost);
+    $("costSub").textContent=cvdMode==="standalone"?"월 검사 인원 × CVD 12,100원":"월 검사 인원 × (CVD 12,100원 + 위스키 3,000원)";
+    $("monthlyProfitLabel").textContent="월 순수익";
+    $("monthlyProfit").textContent=fmtWon(monthlyNet);
+    $("monthlyProfitSub").textContent="월 총 수익 − 월 판독 비용";
+    $("breakEven").textContent=fmtWon(annualRevenue);
+    $("breakEvenSub").textContent="월 총 수익 × 12개월";
+    $("futureProfitLabel").textContent="연 순수익";
+    $("futureProfit").textContent=fmtWon(annualNet);
+    $("futureProfitSub").textContent="월 순수익 × 12개월";
+
+    $("profit1Year").textContent=fmtWon(y1); $("profit3Year").textContent=fmtWon(y3); $("profit5Year").textContent=fmtWon(y5);
+    colorProfit($("profit1Year"),y1); colorProfit($("profit3Year"),y3); colorProfit($("profit5Year"),y5);
+    $("caption1").textContent=`${modeName} 기준 1년 누적 순수익`;
+    $("caption3").textContent=`${modeName} 기준 3년 누적 순수익`;
+    $("caption5").textContent=`${modeName} 기준 5년 누적 순수익`;
+    $("formulaBox").innerHTML=`<strong>CVD 계산 기준 · ${h.name} · ${modeName}</strong><br>
+      환자 1명당 총 수익: 안저 급여수가 ${h.fee.toLocaleString("ko-KR")}원 + CVD 비급여수가 ${cvdFee.toLocaleString("ko-KR")}원 = ${grossPerPatient.toLocaleString("ko-KR")}원<br>
+      환자 1명당 비용: CVD 판독권 12,100원${cvdMode==="integrated"?" + 위스키 3,000원":""} = ${costPerPatient.toLocaleString("ko-KR")}원<br>
+      환자 1명당 예상 순수익: ${grossPerPatient.toLocaleString("ko-KR")}원 − ${costPerPatient.toLocaleString("ko-KR")}원 = ${netPerPatient.toLocaleString("ko-KR")}원<br>
+      월 순수익: 환자 1명당 예상 순수익 × 하루 검사 인원 × 22일`;
+  }
+}
+
+document.querySelectorAll(".purchase-tab").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    mode=btn.dataset.mode;
+    document.querySelectorAll(".purchase-tab").forEach(x=>x.classList.toggle("active",x===btn));
+    update();
+  });
+});
+
+document.querySelectorAll(".hospital-tab").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    hospitalType=btn.dataset.type;
+    document.querySelectorAll(".hospital-tab").forEach(x=>x.classList.toggle("active",x===btn));
+    update();
+  });
+});
+
+document.querySelectorAll(".plan-tab").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    planType=btn.dataset.plan;
+    document.querySelectorAll(".plan-tab").forEach(x=>x.classList.toggle("active",x===btn));
+    update();
+  });
+});
+
+document.querySelectorAll(".cvd-mode-tab").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    cvdMode=btn.dataset.cvdMode;
+    document.querySelectorAll(".cvd-mode-tab").forEach(x=>x.classList.toggle("active",x===btn));
+    update();
+  });
+});
+
+$("dailyPatients").addEventListener("input",update);
+$("cvdNoncoveredInput").addEventListener("input",update);
+update();
+</script>
+</body>
+</html>
